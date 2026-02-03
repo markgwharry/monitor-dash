@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="/static/css/operational.css">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-operational">
+    <!-- Top Bar -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <span class="time-display" id="clock">{{ data.time.current }}</span>
+            <span class="date-display">{{ data.time.date }}</span>
+            <span class="week-display">{{ data.time.week }}</span>
+        </div>
+        <div class="topbar-right">
+            <div class="weather-display">
+                <span class="weather-icon">
+                    {% if data.weather.icon == 'sunny' %}&#9728;
+                    {% elif data.weather.icon == 'cloudy' %}&#9729;
+                    {% elif data.weather.icon == 'rainy' %}&#127783;
+                    {% elif data.weather.icon == 'snowy' %}&#10052;
+                    {% else %}&#9729;{% endif %}
+                </span>
+                <span class="weather-temp">{{ data.weather.temp }}&deg;C</span>
+            </div>
+            <span class="mode-indicator">{{ mode_reason }}</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Left Column - Calendar & Commitments -->
+        <div class="column column-left">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Today</span>
+                </div>
+                <div class="card-content">
+                    {% if data.calendar.next_meeting %}
+                    <div class="meeting-item">
+                        <div class="meeting-time">{{ data.calendar.next_meeting.time }}</div>
+                        <div class="meeting-title">{{ data.calendar.next_meeting.title }}</div>
+                        {% if data.calendar.next_meeting.location %}
+                        <div class="meeting-location">{{ data.calendar.next_meeting.location }}</div>
+                        {% endif %}
+                        {% if data.calendar.next_meeting.minutes_until %}
+                        <div class="countdown" id="meeting-countdown">
+                            in {{ data.calendar.next_meeting.minutes_until }}m
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="no-meetings">No more meetings today</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Tomorrow</span>
+                </div>
+                <div class="card-content">
+                    {% if data.calendar.tomorrow_first %}
+                    <div class="meeting-item">
+                        <div class="meeting-time">{{ data.calendar.tomorrow_first.time }}</div>
+                        <div class="meeting-title">{{ data.calendar.tomorrow_first.title }}</div>
+                    </div>
+                    {% else %}
+                    <div class="no-meetings">Clear</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="travel-status">
+                <span class="travel-status-icon">
+                    {% if 'travel' in data.calendar.travel_status|lower %}&#9992;
+                    {% elif 'trip' in data.calendar.travel_status|lower %}&#128747;
+                    {% else %}&#127968;{% endif %}
+                </span>
+                <span class="travel-status-text">{{ data.calendar.travel_status }}</span>
+            </div>
+        </div>
+
+        <!-- Centre Column - Focus Panel -->
+        <div class="column column-centre">
+            <div class="focus-panel">
+                {% if data.focus.headline %}
+                <h1 class="focus-headline">{{ data.focus.headline }}</h1>
+                {% if data.focus.subtitle %}
+                <p class="focus-subtitle">{{ data.focus.subtitle }}</p>
+                {% endif %}
+                {% if data.focus.deadline %}
+                <div class="focus-deadline">
+                    <span class="deadline-label">{{ data.focus.deadline_label or 'Deadline' }}</span>
+                    <span class="deadline-value">{{ data.focus.deadline }}</span>
+                </div>
+                {% endif %}
+                {% else %}
+                <p class="focus-empty">Nothing urgent</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column - Systems & Environment -->
+        <div class="column column-right">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Systems</span>
+                </div>
+                <div class="card-content">
+                    <!-- NAS -->
+                    <div class="system-item">
+                        <span class="system-label">{{ data.systems.nas.name }}</span>
+                        <span class="system-value status-{{ 'online' if data.systems.nas.status == 'online' else 'offline' }}">
+                            {{ data.systems.nas.status }}
+                        </span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill {% if data.systems.nas.used_pct > 90 %}danger{% elif data.systems.nas.used_pct > 75 %}warning{% endif %}"
+                             style="width: {{ data.systems.nas.used_pct }}%"></div>
+                    </div>
+                    <div class="system-detail">{{ data.systems.nas.used_tb }}TB / {{ data.systems.nas.total_tb }}TB</div>
+
+                    <!-- Docker -->
+                    <div class="system-item">
+                        <span class="system-label">Docker</span>
+                        <span class="system-value status-{{ 'online' if data.systems.docker.status == 'healthy' else 'warning' }}">
+                            {{ data.systems.docker.running }}/{{ data.systems.docker.total }}
+                        </span>
+                    </div>
+
+                    <!-- Network -->
+                    <div class="system-item">
+                        <span class="system-label">Network</span>
+                        <span class="system-value status-{{ 'online' if data.systems.network.status == 'up' else 'offline' }}">
+                            {{ data.systems.network.external_ip }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Environment</span>
+                </div>
+                <div class="card-content">
+                    <!-- Air Quality -->
+                    <div class="system-item">
+                        <span class="system-label">Air Quality</span>
+                        <span class="system-value">
+                            PM2.5: {{ data.systems.air_quality.pm25 }}
+                            <span class="quality-badge quality-{{ data.systems.air_quality.voc }}">
+                                {{ data.systems.air_quality.pm25_label }}
+                            </span>
+                        </span>
+                    </div>
+
+                    <!-- Indoor -->
+                    <div class="system-item">
+                        <span class="system-label">Indoor</span>
+                        <span class="system-value">
+                            {{ data.systems.indoor.temp }}&deg;C &middot; {{ data.systems.indoor.humidity }}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/clock.js"></script>
+{% endblock %}

@@ -1,0 +1,16 @@
+[Unit]
+Description=Pi Dashboard Kiosk
+After=network-online.target graphical.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+Environment=DISPLAY=:0
+WorkingDirectory=/home/pi/apps/dashboard/repo
+ExecStart=/home/pi/apps/dashboard/repo/scripts/kiosk-start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=graphical.target

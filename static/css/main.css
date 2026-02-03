@@ -1,0 +1,342 @@
+/* Main CSS - Core layout for 1080x1920 portrait display */
+
+:root {
+    /* Colors - Dark theme */
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: #1a1a24;
+    --bg-card-hover: #22222e;
+
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0b0;
+    --text-muted: #606070;
+
+    --accent-primary: #3b82f6;
+    --accent-success: #22c55e;
+    --accent-warning: #f59e0b;
+    --accent-danger: #ef4444;
+
+    --border-color: #2a2a3a;
+
+    /* Typography */
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'SF Mono', 'Fira Code', monospace;
+
+    /* Sizing */
+    --spacing-xs: 8px;
+    --spacing-sm: 12px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+
+    /* Layout zones */
+    --topbar-height: 100px;
+    --column-gap: 16px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    font-family: var(--font-family);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* ============================================
+   OPERATIONAL MODE LAYOUT
+   Portrait 1080x1920 - CSS Grid
+   ============================================ */
+
+.dashboard-operational {
+    display: grid;
+    grid-template-rows: var(--topbar-height) 1fr;
+    grid-template-columns: 1fr;
+    height: 100%;
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+}
+
+/* Top Bar */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 0 var(--spacing-lg);
+}
+
+.topbar-left {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-lg);
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.time-display {
+    font-size: 48px;
+    font-weight: 300;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1px;
+}
+
+.date-display {
+    font-size: 18px;
+    color: var(--text-secondary);
+}
+
+.week-display {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+.weather-display {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.weather-icon {
+    font-size: 28px;
+}
+
+.weather-temp {
+    font-size: 24px;
+    font-weight: 500;
+}
+
+.mode-indicator {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+}
+
+/* Main Content Area - 3 column layout */
+.main-content {
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    gap: var(--spacing-md);
+    min-height: 0;
+}
+
+/* Columns */
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Cards */
+.card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--border-color);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+}
+
+.card-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+
+.card-content {
+    flex: 1;
+}
+
+/* Focus Panel - Centre column star */
+.focus-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+}
+
+.focus-headline {
+    font-size: 42px;
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: var(--spacing-md);
+}
+
+.focus-subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+}
+
+.focus-empty {
+    color: var(--text-muted);
+    font-size: 18px;
+}
+
+/* Calendar Section */
+.meeting-item {
+    padding: var(--spacing-md) 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.meeting-item:last-child {
+    border-bottom: none;
+}
+
+.meeting-time {
+    font-size: 14px;
+    color: var(--accent-primary);
+    font-family: var(--font-mono);
+    margin-bottom: 4px;
+}
+
+.meeting-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.meeting-location {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.countdown {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--accent-primary);
+    font-family: var(--font-mono);
+}
+
+.travel-status {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    margin-top: var(--spacing-md);
+}
+
+.travel-status-icon {
+    font-size: 20px;
+}
+
+.travel-status-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* Systems Section */
+.system-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.system-item:last-child {
+    border-bottom: none;
+}
+
+.system-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.system-value {
+    font-size: 14px;
+    font-family: var(--font-mono);
+}
+
+.status-online {
+    color: var(--accent-success);
+}
+
+.status-warning {
+    color: var(--accent-warning);
+}
+
+.status-offline {
+    color: var(--accent-danger);
+}
+
+/* Progress bars */
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-secondary);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent-primary);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.progress-fill.warning {
+    background: var(--accent-warning);
+}
+
+.progress-fill.danger {
+    background: var(--accent-danger);
+}
+
+/* ============================================
+   AMBIENT MODE LAYOUT
+   ============================================ */
+
+.dashboard-ambient {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Transitions */
+.dashboard-operational,
+.dashboard-ambient {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

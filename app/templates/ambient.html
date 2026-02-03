@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="/static/css/ambient.css">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-ambient">
+    <!-- Gradient layers for ambient effect -->
+    <div class="ambient-layer layer-1"></div>
+    <div class="ambient-layer layer-2"></div>
+    <div class="ambient-layer layer-3"></div>
+
+    <!-- Subtle overlay with noise texture -->
+    <div class="ambient-noise"></div>
+
+    <!-- Optional: Hidden data that affects colors (Phase 2+) -->
+    <div class="ambient-data"
+         data-temp="{{ data.weather.temp }}"
+         data-humidity="{{ data.systems.indoor.humidity }}"
+         data-air-quality="{{ data.systems.air_quality.voc }}"
+         style="display: none;">
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/ambient-art.js"></script>
+{% endblock %}

@@ -1,0 +1,92 @@
+/* Operational Mode Specific Styles */
+
+/* No meetings state */
+.no-meetings {
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: var(--spacing-md) 0;
+}
+
+/* System detail text */
+.system-detail {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    margin-bottom: var(--spacing-md);
+}
+
+/* Quality badges */
+.quality-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    text-transform: uppercase;
+}
+
+.quality-good {
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--accent-success);
+}
+
+.quality-moderate {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--accent-warning);
+}
+
+.quality-poor {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--accent-danger);
+}
+
+/* Focus panel deadline */
+.focus-deadline {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+}
+
+.deadline-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.deadline-value {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--accent-warning);
+}
+
+/* Countdown animation */
+.countdown {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Card scroll for long content */
+.card-content {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.card-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.card-content::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+.card-content::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
+}
