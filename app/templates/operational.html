@@ -6,170 +6,402 @@
 
 {% block content %}
 <div class="dashboard-operational">
-    <!-- Top Bar -->
-    <header class="topbar">
-        <div class="topbar-left">
-            <span class="time-display" id="clock">{{ data.time.current }}</span>
-            <span class="date-display">{{ data.time.date }}</span>
-            <span class="week-display">{{ data.time.week }}</span>
+
+    <!-- ====== HEADER ====== -->
+    <header class="header">
+        <div class="clock-group">
+            <span class="clock" id="clock">{{ data.time.current }}</span><span class="clock-sep" id="clock-sep">:</span><span class="clock-seconds" id="clock-seconds">{{ data.time.seconds }}</span>
         </div>
-        <div class="topbar-right">
-            <div class="weather-display">
-                <span class="weather-icon">
-                    {% if data.weather.icon == 'sunny' %}&#9728;
-                    {% elif data.weather.icon == 'cloudy' %}&#9729;
-                    {% elif data.weather.icon == 'rainy' %}&#127783;
-                    {% elif data.weather.icon == 'snowy' %}&#10052;
-                    {% else %}&#9729;{% endif %}
-                </span>
-                <span class="weather-temp">{{ data.weather.temp }}&deg;C</span>
-            </div>
-            <span class="mode-indicator">{{ mode_reason }}</span>
+        <div class="header-meta">
+            <span class="header-date">{{ data.time.date_short }}</span>
+            <span class="header-divider">/</span>
+            <span class="header-week">{{ data.time.week }}</span>
+            <span class="header-divider">/</span>
+            <span class="header-year">{{ data.time.year }}</span>
+        </div>
+        <div class="header-weather">
+            <span class="header-weather-icon">
+                {% if data.weather.icon == 'sunny' %}&#9728;{% elif data.weather.icon == 'cloudy' %}&#9729;{% elif data.weather.icon == 'rainy' %}&#9730;{% elif data.weather.icon == 'snowy' %}&#10052;{% else %}&#9729;{% endif %}
+            </span>
+            <span class="header-weather-temp">{{ data.weather.temp }}&deg;</span>
+            <span class="header-weather-cond">{{ data.weather.condition }}</span>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Left Column - Calendar & Commitments -->
-        <div class="column column-left">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">Today</span>
-                </div>
-                <div class="card-content">
-                    {% if data.calendar.next_meeting %}
-                    <div class="meeting-item">
-                        <div class="meeting-time">{{ data.calendar.next_meeting.time }}</div>
-                        <div class="meeting-title">{{ data.calendar.next_meeting.title }}</div>
-                        {% if data.calendar.next_meeting.location %}
-                        <div class="meeting-location">{{ data.calendar.next_meeting.location }}</div>
-                        {% endif %}
-                        {% if data.calendar.next_meeting.minutes_until %}
-                        <div class="countdown" id="meeting-countdown">
-                            in {{ data.calendar.next_meeting.minutes_until }}m
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% else %}
-                    <div class="no-meetings">No more meetings today</div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">Tomorrow</span>
-                </div>
-                <div class="card-content">
-                    {% if data.calendar.tomorrow_first %}
-                    <div class="meeting-item">
-                        <div class="meeting-time">{{ data.calendar.tomorrow_first.time }}</div>
-                        <div class="meeting-title">{{ data.calendar.tomorrow_first.title }}</div>
-                    </div>
-                    {% else %}
-                    <div class="no-meetings">Clear</div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="travel-status">
-                <span class="travel-status-icon">
-                    {% if 'travel' in data.calendar.travel_status|lower %}&#9992;
-                    {% elif 'trip' in data.calendar.travel_status|lower %}&#128747;
-                    {% else %}&#127968;{% endif %}
-                </span>
-                <span class="travel-status-text">{{ data.calendar.travel_status }}</span>
-            </div>
+    <!-- ====== DAY PROGRESS ====== -->
+    <div class="day-progress">
+        <div class="day-progress-track">
+            <div class="day-progress-fill" id="day-progress" style="width: {{ data.time.day_progress_pct }}%"></div>
         </div>
+    </div>
 
-        <!-- Centre Column - Focus Panel -->
-        <div class="column column-centre">
-            <div class="focus-panel">
-                {% if data.focus.headline %}
-                <h1 class="focus-headline">{{ data.focus.headline }}</h1>
-                {% if data.focus.subtitle %}
-                <p class="focus-subtitle">{{ data.focus.subtitle }}</p>
-                {% endif %}
-                {% if data.focus.deadline %}
-                <div class="focus-deadline">
-                    <span class="deadline-label">{{ data.focus.deadline_label or 'Deadline' }}</span>
-                    <span class="deadline-value">{{ data.focus.deadline }}</span>
-                </div>
-                {% endif %}
+    <!-- ====== PRIORITY ROW ====== -->
+    <div class="priority-row">
+        <!-- Next Meeting -->
+        <div class="panel panel-next anim-panel" style="--panel-i:2">
+            <div class="panel-label">
+                {% if data.calendar.next_meeting %}
+                    {% if data.calendar.next_meeting.active %}
+                        NOW
+                    {% else %}
+                        NEXT
+                        {% if data.calendar.next_meeting.minutes_until is defined %}
+                            <span class="panel-label-accent" id="next-countdown">{{ data.calendar.next_meeting.minutes_until }}m</span>
+                        {% endif %}
+                    {% endif %}
                 {% else %}
-                <p class="focus-empty">Nothing urgent</p>
+                    CLEAR
                 {% endif %}
             </div>
+            {% if data.calendar.next_meeting %}
+            <div class="next-title">{{ data.calendar.next_meeting.title }}</div>
+            <div class="next-meta">
+                <span class="mono">{{ data.calendar.next_meeting.time }}</span>
+                {% if data.calendar.next_meeting.location %}
+                <span class="next-loc">{{ data.calendar.next_meeting.location }}</span>
+                {% endif %}
+            </div>
+            {% if data.calendar.next_meeting.active %}
+            <div class="next-active-bar">
+                <span class="next-active-label">{{ data.calendar.next_meeting.minutes_remaining }}m remaining</span>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="next-empty">No more meetings</div>
+            {% endif %}
         </div>
 
-        <!-- Right Column - Systems & Environment -->
-        <div class="column column-right">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">Systems</span>
+        <!-- Day Summary -->
+        <div class="panel panel-summary anim-panel" style="--panel-i:3">
+            <div class="panel-label">SUMMARY</div>
+            {% set s = data.calendar.day_summary %}
+            <div class="summary-grid">
+                <div class="summary-stat">
+                    <span class="summary-value mono">{{ s.meetings_remaining }}<span class="summary-unit">/ {{ s.meetings_total }}</span></span>
+                    <span class="summary-label">MEETINGS LEFT</span>
                 </div>
-                <div class="card-content">
-                    <!-- NAS -->
-                    <div class="system-item">
-                        <span class="system-label">{{ data.systems.nas.name }}</span>
-                        <span class="system-value status-{{ 'online' if data.systems.nas.status == 'online' else 'offline' }}">
-                            {{ data.systems.nas.status }}
-                        </span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill {% if data.systems.nas.used_pct > 90 %}danger{% elif data.systems.nas.used_pct > 75 %}warning{% endif %}"
-                             style="width: {{ data.systems.nas.used_pct }}%"></div>
-                    </div>
-                    <div class="system-detail">{{ data.systems.nas.used_tb }}TB / {{ data.systems.nas.total_tb }}TB</div>
+                <div class="summary-stat">
+                    <span class="summary-value mono">{{ s.free_remaining }}</span>
+                    <span class="summary-label">FREE TIME</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="summary-value mono">{{ s.next_break }}</span>
+                    {% if s.next_break_duration %}<span class="summary-detail mono">{{ s.next_break_duration }}</span>{% endif %}
+                    <span class="summary-label">NEXT BREAK</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="summary-value mono">{{ s.done_at }}</span>
+                    <span class="summary-label">DONE AT</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Docker -->
-                    <div class="system-item">
-                        <span class="system-label">Docker</span>
-                        <span class="system-value status-{{ 'online' if data.systems.docker.status == 'healthy' else 'warning' }}">
-                            {{ data.systems.docker.running }}/{{ data.systems.docker.total }}
-                        </span>
-                    </div>
+    <!-- ====== TODAY'S SCHEDULE ====== -->
+    <div class="panel panel-schedule anim-panel" style="--panel-i:4">
+        <div class="panel-header">
+            <span class="panel-label">TODAY</span>
+            <span class="panel-header-right">
+                <span class="panel-stat">{{ data.calendar.total_today }} meetings</span>
+            </span>
+        </div>
+        <div class="schedule-list">
+            {% for event in data.calendar.events_today %}
+            <div class="event{% if event.passed %} passed{% endif %}{% if event.active %} active{% endif %}{% if event.is_next %} is-next{% endif %}">
+                <span class="event-time mono">{{ event.time }}</span>
+                <span class="event-dot"></span>
+                <span class="event-title">{{ event.title }}</span>
+                <span class="event-location">{{ event.location }}</span>
+                <span class="event-duration mono">{{ event.duration }}</span>
+                <span class="event-status">
+                    {% if event.passed %}
+                        <span class="event-check">&check;</span>
+                    {% elif event.active %}
+                        <span class="event-active-indicator">LIVE</span>
+                    {% elif event.is_next %}
+                        <span class="event-countdown mono">{{ event.minutes_until }}m</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 
-                    <!-- Network -->
-                    <div class="system-item">
-                        <span class="system-label">Network</span>
-                        <span class="system-value status-{{ 'online' if data.systems.network.status == 'up' else 'offline' }}">
-                            {{ data.systems.network.external_ip }}
-                        </span>
+    <!-- ====== TOMORROW ====== -->
+    <div class="panel panel-tomorrow anim-panel" style="--panel-i:5">
+        <span class="panel-label">TOMORROW</span>
+        <div class="tomorrow-events">
+            {% for event in data.calendar.events_tomorrow %}
+            <span class="tomorrow-event">
+                <span class="mono">{{ event.time }}</span> {{ event.title }}
+            </span>
+            {% if not loop.last %}<span class="tomorrow-sep">&middot;</span>{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ====== SYSTEMS + ENVIRONMENT ====== -->
+    <div class="info-row">
+        <!-- Systems Panel -->
+        <div class="panel panel-systems anim-panel" style="--panel-i:6">
+            <div class="panel-label">SYSTEMS</div>
+
+            <!-- Docker -->
+            <div class="sys-section">
+                <div class="sys-row">
+                    <span class="sys-name">Docker</span>
+                    <span class="sys-status">
+                        <span class="dot dot-{{ 'green' if data.systems.docker.status == 'healthy' else 'amber' }}"></span>
+                        <span class="mono">{{ data.systems.docker.running }}/{{ data.systems.docker.total }}</span>
+                    </span>
+                </div>
+                <div class="docker-grid">
+                    {% for c in data.systems.docker.containers %}
+                    <span class="docker-badge {{ c.status }}">{{ c.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Camera -->
+            <div class="sys-section">
+                <div class="sys-row">
+                    <span class="sys-name">Driveway</span>
+                    <span class="sys-status">
+                        <span class="dot dot-green" id="camera-status"></span>
+                        <span class="mono" id="camera-time"></span>
+                    </span>
+                </div>
+                <div class="camera-container">
+                    <img id="camera-feed"
+                         src="{{ data.camera.snapshot_url }}"
+                         alt="Driveway camera"
+                         class="camera-image">
+                </div>
+            </div>
+
+            <!-- Pi Host -->
+            <div class="sys-section">
+                <div class="sys-row">
+                    <span class="sys-name">Host</span>
+                    <span class="sys-status">
+                        <span class="mono">Up {{ data.systems.pi.uptime }}</span>
+                    </span>
+                </div>
+                <div class="pi-stats">
+                    <div class="pi-stat">
+                        <span class="pi-stat-value mono">{{ data.systems.pi.cpu_pct }}%</span>
+                        <span class="pi-stat-label">CPU</span>
+                    </div>
+                    <div class="pi-stat">
+                        <span class="pi-stat-value mono">{{ data.systems.pi.memory_pct }}%</span>
+                        <span class="pi-stat-label">MEM</span>
+                    </div>
+                    <div class="pi-stat">
+                        <span class="pi-stat-value mono">{{ data.systems.pi.temp }}&deg;</span>
+                        <span class="pi-stat-label">TEMP</span>
+                    </div>
+                    <div class="pi-stat">
+                        <span class="pi-stat-value mono">{{ data.systems.pi.disk_pct }}%</span>
+                        <span class="pi-stat-label">DISK</span>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">Environment</span>
+            <!-- Printer -->
+            <div class="sys-section">
+                <div class="sys-row">
+                    <span class="sys-name">Printer</span>
+                    <span class="sys-status">
+                        {% if data.systems.printer.overall_status == 'critical' %}
+                        <span class="badge badge-poor">LOW TONER</span>
+                        {% elif data.systems.printer.overall_status == 'low' %}
+                        <span class="badge badge-fair">TONER LOW</span>
+                        {% else %}
+                        <span class="dot dot-green"></span>
+                        {% endif %}
+                    </span>
                 </div>
-                <div class="card-content">
-                    <!-- Air Quality -->
-                    <div class="system-item">
-                        <span class="system-label">Air Quality</span>
-                        <span class="system-value">
-                            PM2.5: {{ data.systems.air_quality.pm25 }}
-                            <span class="quality-badge quality-{{ data.systems.air_quality.voc }}">
-                                {{ data.systems.air_quality.pm25_label }}
-                            </span>
-                        </span>
+                <div class="toner-bars">
+                    <div class="toner-bar">
+                        <div class="toner-fill toner-black" style="width: {{ data.systems.printer.toners.black }}%"></div>
+                        <span class="toner-label">K</span>
+                        <span class="toner-pct mono">{{ data.systems.printer.toners.black }}%</span>
                     </div>
-
-                    <!-- Indoor -->
-                    <div class="system-item">
-                        <span class="system-label">Indoor</span>
-                        <span class="system-value">
-                            {{ data.systems.indoor.temp }}&deg;C &middot; {{ data.systems.indoor.humidity }}%
-                        </span>
+                    <div class="toner-bar">
+                        <div class="toner-fill toner-cyan" style="width: {{ data.systems.printer.toners.cyan }}%"></div>
+                        <span class="toner-label">C</span>
+                        <span class="toner-pct mono">{{ data.systems.printer.toners.cyan }}%</span>
                     </div>
+                    <div class="toner-bar">
+                        <div class="toner-fill toner-magenta" style="width: {{ data.systems.printer.toners.magenta }}%"></div>
+                        <span class="toner-label">M</span>
+                        <span class="toner-pct mono">{{ data.systems.printer.toners.magenta }}%</span>
+                    </div>
+                    <div class="toner-bar">
+                        <div class="toner-fill toner-yellow" style="width: {{ data.systems.printer.toners.yellow }}%"></div>
+                        <span class="toner-label">Y</span>
+                        <span class="toner-pct mono">{{ data.systems.printer.toners.yellow }}%</span>
+                    </div>
+                </div>
+                <div class="printer-queue">
+                    <span class="printer-queue-item">
+                        <span class="env-metric">Queue</span>
+                        {% if data.systems.printer.queue_active > 0 %}
+                        <span class="mono">{{ data.systems.printer.queue_active }}</span>
+                        <span class="badge badge-fair">PRINTING</span>
+                        {% else %}
+                        <span class="mono muted">Empty</span>
+                        {% endif %}
+                    </span>
+                    <span class="printer-queue-item">
+                        <span class="env-metric">Pages</span>
+                        <span class="mono">{{ data.systems.printer.page_count }}</span>
+                    </span>
+                    {% if data.systems.printer.last_print %}
+                    <span class="printer-queue-item">
+                        <span class="env-metric">Last</span>
+                        <span class="mono muted">{{ data.systems.printer.last_print }}</span>
+                    </span>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </main>
+
+        <!-- Environment Panel -->
+        <div class="panel panel-environment anim-panel" style="--panel-i:7">
+            <div class="panel-label">ENVIRONMENT</div>
+
+            <!-- Indoor -->
+            <div class="env-section">
+                <div class="env-label">Indoor</div>
+                <div class="env-primary-row">
+                    <div class="env-big-stat">
+                        <span class="env-big-value mono">{{ data.systems.indoor.temp }}&deg;</span>
+                        <span class="env-big-unit">C</span>
+                    </div>
+                    <div class="env-big-stat">
+                        <span class="env-big-value mono">{{ data.systems.indoor.humidity }}</span>
+                        <span class="env-big-unit">%RH</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Heating -->
+            <div class="env-section">
+                <div class="env-label">Heating
+                    {% if data.systems.heating.boost %}<span class="badge badge-boost">BOOST</span>{% endif %}
+                </div>
+                <div class="heating-row">
+                    <div class="heating-temps">
+                        <div class="heating-current">
+                            <span class="heating-value mono">{{ data.systems.heating.current_temp }}&deg;</span>
+                            <span class="heating-label">Current</span>
+                        </div>
+                        <span class="heating-arrow">&rarr;</span>
+                        <div class="heating-target">
+                            <span class="heating-value mono">{{ data.systems.heating.target_temp }}&deg;</span>
+                            <span class="heating-label">Target</span>
+                        </div>
+                    </div>
+                    <div class="heating-status">
+                        <span class="dot dot-{{ 'amber' if data.systems.heating.status == 'heating' else 'green' if data.systems.heating.status == 'idle' else 'grey' }}"></span>
+                        <span>{{ data.systems.heating.status_label }}</span>
+                    </div>
+                </div>
+                <div class="heating-water">
+                    <span class="env-metric">Hot Water</span>
+                    <span class="dot dot-{{ 'amber' if data.systems.heating.water_on else 'grey' }}"></span>
+                    <span>{{ 'On' if data.systems.heating.water_on else 'Off' }}</span>
+                    {% if data.systems.heating.water_boost %}<span class="badge badge-boost">BOOST</span>{% endif %}
+                </div>
+            </div>
+
+            <!-- Air Quality -->
+            <div class="env-section">
+                <div class="env-label">Air Quality</div>
+                <div class="env-row">
+                    <span class="env-metric">PM2.5</span>
+                    <span class="mono">{{ data.systems.air_quality.pm25 }}</span>
+                    <span class="badge badge-{{ data.systems.air_quality.pm25_label|lower }}">{{ data.systems.air_quality.pm25_label }}</span>
+                </div>
+                <div class="env-row">
+                    <span class="env-metric">VOC</span>
+                    <span class="mono">{{ data.systems.air_quality.voc_index }}</span>
+                    <span class="badge badge-{{ data.systems.air_quality.voc_label|lower }}">{{ data.systems.air_quality.voc_label }}</span>
+                </div>
+            </div>
+
+            <!-- Weather Detail -->
+            <div class="env-section">
+                <div class="env-label">Outside &middot; {{ data.weather.location }}</div>
+                <div class="weather-primary">
+                    <span class="weather-icon-lg">
+                        {% if data.weather.icon == 'sunny' %}&#9728;{% elif data.weather.icon == 'cloudy' %}&#9729;{% elif data.weather.icon == 'rainy' %}&#9730;{% elif data.weather.icon == 'snowy' %}&#10052;{% else %}&#9729;{% endif %}
+                    </span>
+                    <span class="weather-temp-lg mono">{{ data.weather.temp }}&deg;</span>
+                    <span class="weather-condition-lg">{{ data.weather.condition }}</span>
+                </div>
+                <div class="weather-grid">
+                    <div class="weather-stat">
+                        <span class="weather-stat-label">High</span>
+                        <span class="mono">{{ data.weather.temp_high }}&deg;</span>
+                    </div>
+                    <div class="weather-stat">
+                        <span class="weather-stat-label">Low</span>
+                        <span class="mono">{{ data.weather.temp_low }}&deg;</span>
+                    </div>
+                    <div class="weather-stat">
+                        <span class="weather-stat-label">Feels</span>
+                        <span class="mono">{{ data.weather.feels_like }}&deg;</span>
+                    </div>
+                    <div class="weather-stat">
+                        <span class="weather-stat-label">Wind</span>
+                        <span class="mono">{{ data.weather.wind_mph }}mph</span>
+                    </div>
+                    <div class="weather-stat">
+                        <span class="weather-stat-label">Rain</span>
+                        <span class="mono">{{ data.weather.rain_chance }}%</span>
+                    </div>
+                    <div class="weather-stat">
+                        <span class="weather-stat-label">Humid</span>
+                        <span class="mono">{{ data.weather.humidity }}%</span>
+                    </div>
+                </div>
+                <div class="weather-sun">
+                    <span class="weather-sun-item"><span class="sun-arrow up"></span> {{ data.weather.sunrise }}</span>
+                    <span class="weather-sun-item"><span class="sun-arrow down"></span> {{ data.weather.sunset }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== STATUS FOOTER ====== -->
+    <footer class="status-bar anim-panel" style="--panel-i:8">
+        <div class="status-item">
+            <span class="status-icon">
+                {% if 'home' in data.calendar.travel_status|lower %}&#8962;{% elif 'office' in data.calendar.travel_status|lower %}&#9632;{% else %}&#9992;{% endif %}
+            </span>
+            <span>{{ data.calendar.travel_status }}</span>
+        </div>
+        <div class="status-item">
+            <span class="dot dot-green"></span>
+            <span>{{ data.weather.location }}</span>
+        </div>
+        <div class="status-item">
+            <span class="status-mode-badge">{{ mode.value|upper }}</span>
+        </div>
+        <a class="status-item status-game-link" href="/games/letters">
+            <span>&#9733; Letters</span>
+        </a>
+        <div class="status-item status-refresh">
+            <span class="muted">Updated</span>
+            <span class="mono" id="last-refresh">{{ data.time.current }}</span>
+        </div>
+    </footer>
+
 </div>
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/js/clock.js"></script>
+<script src="/static/js/clock.js?v=2"></script>
 {% endblock %}

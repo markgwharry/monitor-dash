@@ -1,0 +1,15 @@
+[Unit]
+Description=Pi Dashboard Backend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/apps/dashboard/repo
+ExecStart=/home/pi/apps/dashboard/repo/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8080
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -5,14 +5,48 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
+from app.config import settings
 from app.services.mode_manager import ModeManager
 from app.services.data_aggregator import DataAggregator
 from app.services.providers.mock import MockDataProvider
+from app.services.providers.pi_health import PiHealthProvider
+from app.services.providers.air_quality import AirQualityProvider
+from app.services.providers.docker import DockerProvider
+from app.services.providers.weather import WeatherProvider
+from app.services.providers.calendar import CalendarProvider
+from app.services.providers.camera import CameraProvider
+from app.services.providers.heating import HeatingProvider
+from app.services.providers.printer import PrinterProvider
 from app.routers import api, mode
 
 # Singleton instances
 mode_manager = ModeManager()
-data_aggregator = DataAggregator(providers=[MockDataProvider()])
+data_aggregator = DataAggregator(providers=[
+    MockDataProvider(),          # fallback base layer
+    PiHealthProvider(),
+    AirQualityProvider(endpoint=settings.air_sensor_url),
+    DockerProvider(
+        portainer_url=settings.portainer_url,
+        api_key=settings.portainer_api_key,
+        endpoint_id=settings.portainer_endpoint_id,
+    ),
+    WeatherProvider(api_key=settings.weather_api_key, location=settings.location),
+    CalendarProvider(ics_urls=settings.calendar_ics_urls),
+    CameraProvider(
+        ha_url=settings.homeassistant_url,
+        token=settings.homeassistant_token,
+        entity_id=settings.camera_entity_id,
+    ),
+    HeatingProvider(
+        ha_url=settings.homeassistant_url,
+        token=settings.homeassistant_token,
+    ),
+    PrinterProvider(
+        ha_url=settings.homeassistant_url,
+        token=settings.homeassistant_token,
+        cups_url=settings.cups_url,
+    ),
+])
 
 
 @asynccontextmanager
@@ -38,6 +72,13 @@ app = FastAPI(
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Mount Aine's letter game (static HTML/CSS/JS)
+app.mount(
+    "/games/letters-app",
+    StaticFiles(directory="/home/pi/apps/aine-letters/repo", html=True),
+    name="letters-game",
+)
 
 # Templates
 templates = Jinja2Templates(directory="app/templates")
@@ -102,3 +143,9 @@ async def ambient_preview(request: Request):
             "mode_reason": "preview",
         },
     )
+
+
+@app.get("/games/letters", response_class=HTMLResponse)
+async def letters_game(request: Request):
+    """Aine's Letter Stars game wrapper."""
+    return templates.TemplateResponse("games/letters.html", {"request": request})

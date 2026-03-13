@@ -1,78 +1,160 @@
 /**
- * Live clock and data refresh for operational mode
+ * Operational mode — live clock, day progress, and data refresh
  */
-
-(function() {
+(function () {
     'use strict';
 
-    const clockElement = document.getElementById('clock');
+    const clockEl        = document.getElementById('clock');
+    const clockSecEl     = document.getElementById('clock-seconds');
+    const clockSepEl     = document.getElementById('clock-sep');
+    const dayProgressEl  = document.getElementById('day-progress');
+    const lastRefreshEl  = document.getElementById('last-refresh');
+    const cameraFeedEl   = document.getElementById('camera-feed');
+    const cameraTimeEl   = document.getElementById('camera-time');
+    const cameraStatusEl = document.getElementById('camera-status');
     const refreshInterval = window.DASHBOARD_CONFIG?.refreshInterval || 60000;
+    const cameraRefreshInterval = 5000; // 5 seconds
+
+    // Work day bounds (minutes from midnight)
+    const WORK_START = 9 * 60;
+    const WORK_END   = 18 * 60;
 
     /**
-     * Update the clock display
+     * Update clock display (called every second)
      */
     function updateClock() {
-        if (!clockElement) return;
-
         const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const hh  = String(now.getHours()).padStart(2, '0');
+        const mm  = String(now.getMinutes()).padStart(2, '0');
+        const ss  = String(now.getSeconds()).padStart(2, '0');
 
-        clockElement.textContent = `${hours}:${minutes}`;
+        if (clockEl)    clockEl.textContent    = `${hh}:${mm}`;
+        if (clockSecEl) clockSecEl.textContent = ss;
     }
 
     /**
-     * Check if mode should change and reload if needed
+     * Update day progress bar
+     */
+    function updateDayProgress() {
+        if (!dayProgressEl) return;
+
+        const now  = new Date();
+        const mins = now.getHours() * 60 + now.getMinutes();
+        let pct;
+
+        if (mins <= WORK_START) pct = 0;
+        else if (mins >= WORK_END) pct = 100;
+        else pct = Math.round((mins - WORK_START) / (WORK_END - WORK_START) * 100);
+
+        dayProgressEl.style.width = pct + '%';
+    }
+
+    /**
+     * Refresh camera snapshot
+     */
+    function refreshCamera() {
+        if (!cameraFeedEl) return;
+
+        const newUrl = '/api/camera?_t=' + Date.now();
+
+        // Preload the image to avoid flicker
+        const img = new Image();
+        img.onload = function () {
+            cameraFeedEl.src = newUrl;
+            if (cameraTimeEl) {
+                const now = new Date();
+                cameraTimeEl.textContent = now.toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }
+            if (cameraStatusEl) {
+                cameraStatusEl.classList.remove('dot-red');
+                cameraStatusEl.classList.add('dot-green');
+            }
+        };
+        img.onerror = function () {
+            if (cameraStatusEl) {
+                cameraStatusEl.classList.remove('dot-green');
+                cameraStatusEl.classList.add('dot-red');
+            }
+        };
+        img.src = newUrl;
+    }
+
+    /**
+     * Check if mode should change and reload
      */
     async function checkModeChange() {
         try {
-            const response = await fetch('/api/mode');
-            const data = await response.json();
+            const res  = await fetch('/api/mode');
+            const data = await res.json();
 
             if (data.mode !== window.DASHBOARD_CONFIG?.mode) {
-                // Mode changed, reload the page
                 window.location.reload();
             }
-        } catch (error) {
-            console.error('Error checking mode:', error);
+        } catch (e) {
+            console.error('Mode check error:', e);
         }
     }
 
     /**
-     * Refresh dashboard data
+     * Refresh dashboard data from API
      */
     async function refreshData() {
         try {
-            const response = await fetch('/api/data');
-            const data = await response.json();
+            const res  = await fetch('/api/data');
+            const data = await res.json();
 
-            // Update countdown if present
-            const countdown = document.getElementById('meeting-countdown');
-            if (countdown && data.calendar?.next_meeting?.minutes_until !== undefined) {
-                countdown.textContent = `in ${data.calendar.next_meeting.minutes_until}m`;
+            // Update meeting countdown in priority panel
+            const countdownEl = document.getElementById('next-countdown');
+            if (countdownEl && data.calendar?.next_meeting) {
+                const mtg = data.calendar.next_meeting;
+                if (mtg.active) {
+                    countdownEl.textContent = `${mtg.minutes_remaining}m`;
+                } else if (mtg.minutes_until !== undefined) {
+                    countdownEl.textContent = `${mtg.minutes_until}m`;
+                }
+            }
+
+            // Update last-refresh timestamp
+            if (lastRefreshEl && data.time?.current) {
+                lastRefreshEl.textContent = data.time.current;
             }
 
             // Check for mode change
             await checkModeChange();
-        } catch (error) {
-            console.error('Error refreshing data:', error);
+        } catch (e) {
+            console.error('Data refresh error:', e);
         }
     }
 
-    // Initialize
+    /**
+     * Initialise timers
+     */
     function init() {
-        // Update clock immediately and then every second
         updateClock();
+        updateDayProgress();
+
+        // Clock: every second
         setInterval(updateClock, 1000);
 
-        // Refresh data periodically
+        // Day progress: every minute
+        setInterval(updateDayProgress, 60000);
+
+        // Data refresh
         setInterval(refreshData, refreshInterval);
 
-        // Also check mode more frequently (every 30 seconds)
+        // Mode check: every 30 seconds
         setInterval(checkModeChange, 30000);
+
+        // Camera refresh: every 5 seconds
+        if (cameraFeedEl) {
+            setInterval(refreshCamera, cameraRefreshInterval);
+        }
     }
 
-    // Start when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

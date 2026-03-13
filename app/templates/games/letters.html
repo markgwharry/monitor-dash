@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080, height=1920, initial-scale=1.0">
+    <title>Letter Stars</title>
+    <link rel="stylesheet" href="/games/letters-app/style.css">
+    <style>
+        #back-btn {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 9999;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.4);
+            color: rgba(255,255,255,0.4);
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s;
+            opacity: 0.3;
+            backdrop-filter: blur(4px);
+            text-decoration: none;
+            pointer-events: auto;
+        }
+        #back-btn:hover, #back-btn:active {
+            opacity: 1;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starfield"></canvas>
+
+    <div id="display" class="hidden">
+        <div id="big-letter"></div>
+        <div id="words"></div>
+    </div>
+
+    <div id="maths-display" class="hidden">
+        <div id="maths-question"></div>
+        <div id="maths-input"></div>
+        <div id="maths-feedback"></div>
+    </div>
+
+    <div id="celebration"></div>
+
+    <div id="idle-prompt">Press a key!</div>
+
+    <a id="back-btn" href="/" title="Back to dashboard">&#x2190;</a>
+
+    <script src="/games/letters-app/app.js"></script>
+</body>
+</html>

@@ -6,19 +6,26 @@
 
 {% block content %}
 <div class="dashboard-ambient">
-    <!-- Gradient layers for ambient effect -->
-    <div class="ambient-layer layer-1"></div>
-    <div class="ambient-layer layer-2"></div>
-    <div class="ambient-layer layer-3"></div>
+    <!-- Canvas for particle effects -->
+    <canvas id="ambient-canvas"></canvas>
 
-    <!-- Subtle overlay with noise texture -->
-    <div class="ambient-noise"></div>
+    <!-- Subtle info overlay -->
+    <div class="ambient-info">
+        <div class="ambient-clock-wrap">
+            <span class="ambient-clock" id="ambient-clock">{{ data.time.current }}</span>
+            <span class="ambient-temp" id="ambient-temp">{{ data.weather.temp }}°</span>
+        </div>
+    </div>
 
-    <!-- Optional: Hidden data that affects colors (Phase 2+) -->
+    <!-- Data for JS -->
     <div class="ambient-data"
-         data-temp="{{ data.weather.temp }}"
+         data-temp="{{ data.systems.indoor.temp }}"
+         data-temp-outside="{{ data.weather.temp }}"
          data-humidity="{{ data.systems.indoor.humidity }}"
-         data-air-quality="{{ data.systems.air_quality.voc }}"
+         data-condition="{{ data.weather.condition }}"
+         data-air-quality="{{ data.systems.air_quality.pm25_label|lower }}"
+         data-heating-on="{{ 'true' if data.systems.heating.status == 'heating' else 'false' }}"
+         data-next-event-mins="{{ data.calendar.next_meeting.minutes_until if data.calendar.next_meeting else '' }}"
          style="display: none;">
     </div>
 </div>

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1080, height=1920, initial-scale=1.0">
     <title>Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/main.css">
     {% block styles %}{% endblock %}
 </head>
@@ -11,12 +14,12 @@
     {% block content %}{% endblock %}
 
     <script>
-        // Global config
         window.DASHBOARD_CONFIG = {
             mode: "{{ mode.value }}",
             refreshInterval: 60000
         };
     </script>
+    <script src="/static/js/screen-care.js"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

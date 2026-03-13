@@ -1,132 +1,67 @@
-/* Ambient Mode - Calming generative visuals */
+/* Ambient Mode - Data as Art */
 
 .dashboard-ambient {
     position: relative;
-    width: 100%;
-    height: 100%;
-    background: #0a0a12;
+    width: 1080px;
+    height: 1920px;
+    background: linear-gradient(180deg, #0a0f1a 0%, #101828 40%, #182438 100%);
     overflow: hidden;
 }
 
-/* Gradient layers - slow moving, overlapping */
-.ambient-layer {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    opacity: 0.6;
-}
-
-.layer-1 {
-    background: radial-gradient(
-        ellipse at 30% 20%,
-        rgba(59, 130, 246, 0.4) 0%,
-        transparent 50%
-    );
-    animation: drift1 60s ease-in-out infinite;
-}
-
-.layer-2 {
-    background: radial-gradient(
-        ellipse at 70% 60%,
-        rgba(139, 92, 246, 0.3) 0%,
-        transparent 50%
-    );
-    animation: drift2 80s ease-in-out infinite;
-}
-
-.layer-3 {
-    background: radial-gradient(
-        ellipse at 50% 80%,
-        rgba(16, 185, 129, 0.25) 0%,
-        transparent 50%
-    );
-    animation: drift3 70s ease-in-out infinite;
-}
-
-/* Slow drifting animations */
-@keyframes drift1 {
-    0%, 100% {
-        transform: translate(0%, 0%) rotate(0deg);
-    }
-    25% {
-        transform: translate(10%, 5%) rotate(5deg);
-    }
-    50% {
-        transform: translate(5%, 10%) rotate(-3deg);
-    }
-    75% {
-        transform: translate(-5%, 5%) rotate(2deg);
-    }
-}
-
-@keyframes drift2 {
-    0%, 100% {
-        transform: translate(0%, 0%) rotate(0deg);
-    }
-    33% {
-        transform: translate(-8%, 8%) rotate(-4deg);
-    }
-    66% {
-        transform: translate(8%, -5%) rotate(6deg);
-    }
-}
-
-@keyframes drift3 {
-    0%, 100% {
-        transform: translate(0%, 0%) rotate(0deg);
-    }
-    50% {
-        transform: translate(-10%, -10%) rotate(-5deg);
-    }
-}
-
-/* Subtle noise texture overlay */
-.ambient-noise {
+/* Full-screen canvas */
+#ambient-canvas {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0.03;
+}
+
+/* Subtle info overlay */
+.ambient-info {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
     pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    z-index: 10;
 }
 
-/* Color temperature variations based on data (CSS custom properties set by JS) */
+.ambient-clock-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.4;
+    transition: opacity 0.5s ease;
+}
+
+.ambient-clock-wrap:hover {
+    opacity: 0.7;
+}
+
+.ambient-clock {
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-size: 72px;
+    font-weight: 200;
+    letter-spacing: -2px;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 0 40px rgba(255, 255, 255, 0.2);
+}
+
+.ambient-temp {
+    font-family: 'Barlow', sans-serif;
+    font-size: 24px;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 2px;
+}
+
+/* Slow fade in */
 .dashboard-ambient {
-    --temp-shift: 0;
-    --humidity-shift: 0;
-    --quality-shift: 0;
-}
-
-/* Warm shift for cold weather */
-.dashboard-ambient[data-temp-cold="true"] .layer-1 {
-    background: radial-gradient(
-        ellipse at 30% 20%,
-        rgba(239, 68, 68, 0.3) 0%,
-        transparent 50%
-    );
-}
-
-/* Cool shift for warm weather */
-.dashboard-ambient[data-temp-warm="true"] .layer-1 {
-    background: radial-gradient(
-        ellipse at 30% 20%,
-        rgba(6, 182, 212, 0.3) 0%,
-        transparent 50%
-    );
-}
-
-/* Desaturated for poor air quality */
-.dashboard-ambient[data-air-poor="true"] {
-    filter: saturate(0.5);
-}
-
-/* Transition for mode switching */
-.dashboard-ambient {
-    animation: ambientFadeIn 2s ease-out;
+    animation: ambientFadeIn 3s ease-out;
 }
 
 @keyframes ambientFadeIn {
@@ -134,6 +69,20 @@
         opacity: 0;
     }
     to {
+        opacity: 1;
+    }
+}
+
+/* Clock subtle breathing */
+.ambient-clock {
+    animation: clockBreath 8s ease-in-out infinite;
+}
+
+@keyframes clockBreath {
+    0%, 100% {
+        opacity: 0.85;
+    }
+    50% {
         opacity: 1;
     }
 }
