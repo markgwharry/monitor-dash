@@ -76,7 +76,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Mount Aine's letter game (static HTML/CSS/JS)
 app.mount(
     "/games/letters-app",
-    StaticFiles(directory="/home/pi/apps/aine-letters/repo", html=True),
+    StaticFiles(directory=settings.letters_game_path, html=True),
     name="letters-game",
 )
 

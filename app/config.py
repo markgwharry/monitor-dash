@@ -22,33 +22,33 @@ class Settings(BaseSettings):
     location: str = "Linlithgow"
 
     # Air quality sensor endpoint
-    air_sensor_url: str = "http://192.168.1.65"
+    air_sensor_url: str = ""
 
     # OpenWeatherMap API key
-    weather_api_key: str = "af1aec30b0bf4c4d92e98d095c138e54"
+    weather_api_key: str = ""
 
     # Calendar ICS URLs
-    calendar_ics_urls: List[str] = [
-        "https://outlook.office365.com/owa/calendar/b0d1a352210a41e1be0bb0e9ae082f4e%40modini.co.uk/ee719592913f44d5b40d05426ca8f6233967296529659239179/S-1-8-1786912635-2249673433-3159881887-1305142510/reachcalendar.ics",
-        "https://p141-caldav.icloud.com/published/2/MTAxOTEzNTEwMTEwMTkxM4DpN7w-5gAK5Nc8ErB5BeV9Eirsr7NoIbrADCDgXjL1rsWGcO6NvuL1SPl5g0_Y5VdidTblBHXOF60vvDtUQx3sGhjvM03CA6t_aMDkG3Z7GcYf-G3vftK0aXAkiXeXEA",
-        "https://p141-caldav.icloud.com/published/2/MTAxOTEzNTEwMTEwMTkxM4DpN7w-5gAK5Nc8ErB5BeWhhFR11Cire6N_MFM3ryhwwjRWHC6tWeeU8hsrKahiuHYYjaXgfttN4OOQZNm3J-Y",
-    ]
+    calendar_ics_urls: List[str] = []
 
     # Home Assistant
-    homeassistant_url: str = "http://192.168.1.125:8123"
-    homeassistant_token: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJiMDQxMTlmMWI0OWU0MzAxYjllNmYzNzc5OWRkMDExYSIsImlhdCI6MTc2MDI3MjEzNCwiZXhwIjoyMDc1NjMyMTM0fQ.L5i63UBymGfleyqavckMrXAcIsI-SUiJjj7M7yUbjhE"
-    camera_entity_id: str = "camera.driveway_live_view_2"
+    homeassistant_url: str = ""
+    homeassistant_token: str = ""
+    camera_entity_id: str = ""
 
     # CUPS (on NAS)
-    cups_url: str = "http://192.168.1.125:631"
+    cups_url: str = ""
 
     # Portainer API
-    portainer_url: str = "http://192.168.1.125:9000"
-    portainer_api_key: str = "ptr_014GyzLudK1KNzL/2VhkSziKYy56YpozbJyLiwL2sm8="
-    portainer_endpoint_id: int = 3
+    portainer_url: str = ""
+    portainer_api_key: str = ""
+    portainer_endpoint_id: int = 0
+
+    # Aine letters game path (relative or absolute)
+    letters_game_path: str = "../aine-letters/repo"
 
     class Config:
         env_prefix = "DASHBOARD_"
+        env_file = ".env"
 
 
 settings = Settings()
